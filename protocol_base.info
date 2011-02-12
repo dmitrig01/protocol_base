@@ -1,7 +1,6 @@
 core = "6.x"
 dependencies[] = "comment"
 dependencies[] = "features"
-dependencies[] = "imagefield"
 dependencies[] = "menu"
 dependencies[] = "search"
 dependencies[] = "smartqueue_users"
