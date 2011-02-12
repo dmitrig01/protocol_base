@@ -15,7 +15,8 @@ Drupal.behaviors.addToPage = function() {
               }
             }).end())
         )
-      );
+      )
+    $('.overlay-inner #edit-category').change();
     return false;
   });
 }
