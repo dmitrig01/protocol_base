@@ -1,0 +1,139 @@
+<?php
+
+include_once('protocol_base.features.inc');
+
+function protocol_base_menu() {
+  $items['user/%user_uid_optional'] = array(
+    'title' => 'User Page',
+    'access callback' => TRUE,
+    'page callback' => 'protocol_base_user_page',
+    'page arguments' => array(1),
+    'type' => MENU_CALLBACK,
+  );
+  $items['home'] = array(
+    'title' => '',
+    'access callback' => TRUE,
+    'page callback' => 'protocol_base_home',
+    'type' => MENU_CALLBACK,
+  );
+  
+  return $items;
+}
+
+function protocol_base_link_alter(&$links, $node, $comment = NULL) {
+  foreach ($links as $module => $link) {
+    if (strpos($module, 'nodequeue') !== FALSE) {
+      unset($links[$module]);
+    }
+  }
+}
+
+function protocol_base_link($type, $object, $teaser = FALSE) {
+  $links = array();
+
+  if ($type == 'node' && $object->type == 'protocol' && !$teaser) {
+    $links['bookmark'] = array(
+      'title' => t('Add to my page'), 
+      'href' => '<front>', 
+      'attributes' => array('class' => 'bookmark-this-page'),
+    );
+  drupal_add_js(array('addForm' => drupal_get_form('protocol_base_bookmark_form', $object)), 'setting');
+  drupal_add_js(drupal_get_path('module', 'protocol_base') . '/protocol_base.js');
+
+    if (node_access('update', $object)) {
+      $links['edit'] = array(
+        'title' => t('Edit this protocol'), 
+        'href' => "node/$object->nid/edit",
+      );
+    }
+  }
+  return $links;
+}
+
+function protocol_base_bookmark_form(&$form_state, $node) {
+  global $user;
+  $account = $user;
+  $queues = smartqueue_users_get_all_queues();
+  $options = array();
+  foreach ($queues as $qid => $queue) {
+    $subqueues = nodequeue_load_subqueues_by_reference(smartqueue_users_get_subqueue_references($account, $queue));
+    foreach ($subqueues as $subqueue) {
+      $options[$subqueue->sqid] = $subqueue->title;
+    }
+  }
+  $options['add'] = t('Add new category');
+
+  $form['title'] = array(
+    '#value' => '<h2>Add bookmark</h2>',
+  );
+
+  $form['category'] = array(
+    '#type' => 'select',
+    '#title' => t('Category'),
+    '#options' => $options,
+  );
+
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#size' => 40,
+    '#maxlength' => 255,
+  );
+
+  $form['nid'] = array(
+    '#type' => 'value',
+    '#value' => $node->nid,
+  );
+
+  $form['qid'] = array(
+    '#type' => 'value',
+    '#value' => $qid,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add bookmark'),
+  );
+  return $form;
+}
+
+function protocol_base_bookmark_form_submit($form, &$form_state) {
+  global $user;
+  if ($form_state['values']['category'] == 'add') {
+    $queue = nodequeue_load($form_state['values']['qid']);
+    $subqueue = nodequeue_add_subqueue($queue, $form_state['values']['name'], smartqueue_users_get_next_reference_string($user->uid, $form_state['values']['qid']));
+  }
+  else {
+    $subqueue = subqueue_load($form_state['values']['category']);
+    $queue = nodequeue_load($subqueue->qid);
+  }
+  $node = node_load($form_state['values']['nid']);
+  $id = nodequeue_get_content_id($queue, $node);
+  nodequeue_subqueue_add($queue, $subqueue, $id);
+}
+
+function protocol_base_user_page($account) {
+  $query = db_query("SELECT n.nid, n.title, ns.title AS subqueue_title, ns.sqid FROM {nodequeue_subqueue} ns INNER JOIN {nodequeue_nodes} nn ON ns.sqid = nn.sqid INNER JOIN {node} n ON n.nid = nn.nid WHERE ns.reference LIKE('%d-%%')", $account->uid);
+  $subqueues = array();
+  $nodes = array();
+  while ($result = db_fetch_array($query)) {
+    $subqueues[$result['sqid']] = $result['subqueue_title'];
+    $nodes[$result['sqid']][] = l($result['title'], 'node/' . $result['nid']);
+  }
+  $output = '<div class="user-page">';
+  foreach ($subqueues as $sqid => $title) {
+    $output .= theme('item_list', $nodes[$sqid], $title);
+  }
+  $output .= '</div>';
+  drupal_set_title(t('@name\'s page', array('@name' => $account->name)));
+  return $output;
+}
+
+function protocol_base_home() {
+  $output = '<div class="protocol-home"><em>openProtocol</em> is the best way to store, share, and find experimental protocols.</h2><ol>';
+  $output .= '<li class="search"><div>'. drupal_get_form('search_theme_form') .'</div></li>';
+  $output .= '<li><div>Browse' . protocol_base_user_page(user_load(1)) . '</div></li>';
+  $output .= '<li class="create"><div><a href="' . url('node/add/protocol') . '">Create your own!</a></div></li>';
+  $output .= '</ol></div>';
+  drupal_set_title('');
+  return $output;
+}
