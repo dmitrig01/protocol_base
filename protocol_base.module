@@ -31,18 +31,20 @@ function protocol_base_link_alter(&$links, $node, $comment = NULL) {
 function protocol_base_link($type, $object, $teaser = FALSE) {
   $links = array();
 
-  if ($type == 'node' && $object->type == 'protocol' && !$teaser) {
-    $links['bookmark'] = array(
-      'title' => t('Add to my page'), 
-      'href' => '<front>', 
-      'attributes' => array('class' => 'bookmark-this-page'),
-    );
-  drupal_add_js(array('addForm' => drupal_get_form('protocol_base_bookmark_form', $object)), 'setting');
-  drupal_add_js(drupal_get_path('module', 'protocol_base') . '/protocol_base.js');
+  if ($type == 'node' && !$teaser) {
+    if ($object->type == 'protocol') {
+      $links['bookmark'] = array(
+        'title' => t('Add to my page'), 
+        'href' => '<front>', 
+        'attributes' => array('class' => 'bookmark-this-page'),
+      );
+      drupal_add_js(array('addForm' => drupal_get_form('protocol_base_bookmark_form', $object)), 'setting');
+      drupal_add_js(drupal_get_path('module', 'protocol_base') . '/protocol_base.js');
+    }
 
     if (node_access('update', $object)) {
       $links['edit'] = array(
-        'title' => t('Edit this protocol'), 
+        'title' => t('Edit this @type', array('@type' => $object->type)), 
         'href' => "node/$object->nid/edit",
       );
     }
