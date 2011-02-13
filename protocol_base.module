@@ -44,7 +44,7 @@ function protocol_base_link($type, $object, $teaser = FALSE) {
 
     if (node_access('update', $object)) {
       $links['edit'] = array(
-        'title' => t('Edit this @type', array('@type' => $object->typ)), 
+        'title' => t('Edit this @type', array('@type' => $object->type)), 
         'href' => "node/$object->nid/edit",
       );
     }
