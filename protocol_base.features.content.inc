@@ -46,8 +46,6 @@ function protocol_base_content_default_fields() {
       '2' => 2,
     ),
     'referenceable_status' => '1',
-    'advanced_view' => '',
-    'advanced_view_args' => '',
     'widget' => array(
       'autocomplete_match' => 'contains',
       'size' => '60',
