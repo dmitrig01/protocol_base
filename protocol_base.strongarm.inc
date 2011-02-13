@@ -148,13 +148,6 @@ function protocol_base_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'logintoboggan_confirm_email_at_registration';
-  $strongarm->value = '0';
-
-  $export['logintoboggan_confirm_email_at_registration'] = $strongarm;
-  $strongarm = new stdClass;
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
   $strongarm->name = 'logintoboggan_immediate_login_on_register';
   $strongarm->value = 1;
 
@@ -187,9 +180,23 @@ function protocol_base_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'site_403';
+  $strongarm->value = 'toboggan/denied';
+
+  $export['site_403'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'site_frontpage';
   $strongarm->value = 'home';
 
   $export['site_frontpage'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'user_email_verification';
+  $strongarm->value = FALSE;
+
+  $export['user_email_verification'] = $strongarm;
   return $export;
 }

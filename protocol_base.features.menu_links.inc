@@ -22,7 +22,7 @@ function protocol_base_menu_default_menu_links() {
     'external' => '0',
     'has_children' => '0',
     'expanded' => '0',
-    'weight' => '-49',
+    'weight' => '-47',
   );
   // Exported menu link: primary-links:node/add/protocol
   $menu_links['primary-links:node/add/protocol'] = array(
@@ -58,7 +58,7 @@ function protocol_base_menu_default_menu_links() {
     'external' => '0',
     'has_children' => '0',
     'expanded' => '0',
-    'weight' => '-48',
+    'weight' => '-47',
   );
   // Exported menu link: primary-links:user/register
   $menu_links['primary-links:user/register'] = array(
@@ -76,7 +76,7 @@ function protocol_base_menu_default_menu_links() {
     'external' => '0',
     'has_children' => '0',
     'expanded' => '0',
-    'weight' => '-47',
+    'weight' => '-46',
   );
   // Translatables
   // Included for use with string extractors like potx.
